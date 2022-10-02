@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Document</title>
+    <style>
+        [ v-cloak ] {
+            display: none;
+        }
+        h3 {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" v-cloak>
+       <h1>{{message}}</h1>
+       <custom-form />
+       <items-ren />
+       <span dangerouslySe></span>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js" integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.js" integrity="sha512-rozBdNtS7jw9BlC76YF1FQGjz17qQ0J/Vu9ZCFIW374sEy4EZRbRcUZa2RU/MZ90X2mnLU56F75VfdToGV0RiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const app = Vue.createApp({
+            data(){
+                return {
+                    message : 'Hello world'
+                }
+            },
+            
+        }) 
+        app.component('custom-form', {
+            template: `
+            <div>
+            <form class='ui form' @submit.prevent='showValue'>
+                <input
+                    type='text' 
+                    v-model='name1'
+                />
+                <br />
+            </form>
+            <items-ren :items='items'/>
+            <div>
+            `,
+            components: ['items-ren'],
+            data(){
+                return{
+                    name1: 'programming',
+                    items: ''
+                }
+            },
+            methods: {
+               async showValue(){
+                    const { data }= await axios.get('https://en.wikipedia.org/w/api.php',{
+                        params: {
+                            action: "query",
+                            list: "search",
+                            origin: '*',
+                            format: "json",
+                            srsearch: this.name1       
+                        }
+                    })
+                    this.items=data.query.search
+                    
+                }
+            }
+            
+
+        })
+        app.component('items-ren', {
+            template:`
+            <h5>you have {{items.length}} results</53>
+                <div v-for='item in items'>
+                    <hr />
+                    <h4>{{item.title}}</h4>
+                    <span v-html='item.snippet'>{{item.snippet}}</span>
+                </div>
+            `,
+            props:['items']
+        })
+    app.mount('#app')
+    </script>
+    
+    
+</body>
+</html>
